@@ -1,0 +1,23 @@
+version: '3'
+services:
+  my-spring-app:
+    build: ./backend
+    ports:
+      - 8080:8080
+    depends_on:
+      - my-db
+  my-angular-app:
+    build: ./client
+    ports:
+      - 4200:80
+  my-db:
+    build: ./MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: ecommerceapp
+      MYSQL_USER: ecommerceapp
+      MYSQL_PASSWORD: ecommerceapp
+    volumes:
+      - db_data:/var/lib/mysql
+volumes:
+  db_data:
