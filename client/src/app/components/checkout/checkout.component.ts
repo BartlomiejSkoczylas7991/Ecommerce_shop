@@ -6,6 +6,10 @@ import { FormBuilder } from '@angular/forms';
 import { Country } from 'src/app/common/country';
 import { State } from 'src/app/common/state';
 import { EcommerceValidators } from 'src/app/validators/ecommerce-validators';
+import { Router } from '@angular/router';
+import { CheckoutService } from 'src/app/services/checkout.service';
+import { Order } from 'src/app/common/order';
+import { OrderItem } from 'src/app/common/order-item';
 
 @Component({
   selector: 'app-checkout',
@@ -31,7 +35,9 @@ export class CheckoutComponent implements OnInit{
 
   constructor(private formBuilder: FormBuilder,
               private eCommerceFormService: ECommerceFormService,
-              private cartService: CartService) { }
+              private cartService: CartService,
+              private checkoutService: CheckoutService,
+              private router: Router) { }
 
   ngOnInit(): void{
 
@@ -167,16 +173,36 @@ export class CheckoutComponent implements OnInit{
 
     if (this.checkoutFormGroup.invalid){
       this.checkoutFormGroup.markAllAsTouched();
+      return;
     }
 
-    console.log(this.checkoutFormGroup.get('customer').value);
-    console.log("The email address is " + this.checkoutFormGroup.get('customer').value.email);
+    // set up order
+    let order = new Order();
+    order.totalPrice = this.totalPrice;
+    order.totalQuantity = this.totalQuantity;
+    // get card items
+    const cartItems = this.cartService.cartItems;
+    /*
+    // create orderItems from cartItems
+    let orderItems: OrderItem[] = [];
+    for (let i=0; i < cartItems.length; i++){
+      orderItems[i] = new OrderItem(cartItems[i]);
+    }
+    */
 
-    console.log("The shipping address country is " + this.checkoutFormGroup.get('shippingAddress').value.country.name);
-    console.log("The shipping address state is " + this.checkoutFormGroup.get('shippingAddress').value.state.name);
+    let orderItemsShort: OrderItem[] = cartItems.map(tempCartItem => new OrderItem(tempCartItem));
 
 
+    // set up purchase
+    let purchase = new Purchase();
 
+    // populate purchase - shipping address
+    purchase.shippingAddress = this.checkoutFormGroup.controls['shippingAddress']
+    // populate purchase - billing address
+
+    // populate purchase - order and orderItems
+
+    // call REST API via the CheckoutService
   }
 
   handleMonthsAndYears() {
