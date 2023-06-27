@@ -1,3 +1,4 @@
+import { CartService } from 'src/app/services/cart.service';
 import { ECommerceFormService } from './../../services/ecommerce-form.service';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -5,6 +6,10 @@ import { FormBuilder } from '@angular/forms';
 import { Country } from 'src/app/common/country';
 import { State } from 'src/app/common/state';
 import { EcommerceValidators } from 'src/app/validators/ecommerce-validators';
+import { Router } from '@angular/router';
+import { CheckoutService } from 'src/app/services/checkout.service';
+import { Order } from 'src/app/common/order';
+import { OrderItem } from 'src/app/common/order-item';
 
 @Component({
   selector: 'app-checkout',
@@ -29,9 +34,14 @@ export class CheckoutComponent implements OnInit{
 
 
   constructor(private formBuilder: FormBuilder,
-              private eCommerceFormService: ECommerceFormService) { }
+              private eCommerceFormService: ECommerceFormService,
+              private cartService: CartService,
+              private checkoutService: CheckoutService,
+              private router: Router) { }
 
   ngOnInit(): void{
+
+    this.reviewCartDetails();
 
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
@@ -45,8 +55,7 @@ export class CheckoutComponent implements OnInit{
                                         EcommerceValidators.notOnlyWhitespace]),
         email: new FormControl('',
                                     [Validators.required,
-                                      Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$'), ,
-                                      EcommerceValidators.notOnlyWhitespace])
+                                      Validators.pattern('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,4}$')])
       }),
       shippingAddress: this.formBuilder.group({
         street: new FormControl('', [Validators.required, Validators.minLength(2),
@@ -67,12 +76,13 @@ export class CheckoutComponent implements OnInit{
         country: new FormControl('', [Validators.required]),
         zipCode: new FormControl('', [Validators.required, Validators.minLength(2),
                                     EcommerceValidators.notOnlyWhitespace])
-}),
-      creditCardAddress: this.formBuilder.group({
-        cardType: [''],
-        nameOnCard: [''],
-        cardNumber: [''],
-        securityCode: [''],
+      }),
+      creditCard: this.formBuilder.group({
+        cardType: new FormControl('', [Validators.required]),
+        nameOnCard: new FormControl('', [Validators.required, Validators.minLength(2),
+                                          EcommerceValidators.notOnlyWhitespace]),
+        cardNumber: new FormControl('', [Validators.required, Validators.pattern('[0-9]{16}')]),
+        securityCode: new FormControl('', [Validators.required, Validators.pattern('[0-9]{3}')]),
         expirationMonth: [''],
         expirationYear: ['']
       })
@@ -107,6 +117,18 @@ export class CheckoutComponent implements OnInit{
       }
     );
   }
+  reviewCartDetails() {
+
+    // subscribe to cartService.totalQuantity
+    this.cartService.totalQuantity.subscribe(
+      totalQuantity => this.totalQuantity = totalQuantity
+    );
+
+    // subscriba to cartService.totalPrice
+    this.cartService.totalPrice.subscribe(
+      totalPrice => this.totalPrice = totalPrice
+    );
+  }
 
   get firstName() {return this.checkoutFormGroup.get('customer.firstName');}
   get lastName() {return this.checkoutFormGroup.get('customer.lastName');}
@@ -123,6 +145,11 @@ export class CheckoutComponent implements OnInit{
   get billingAddressState() {return this.checkoutFormGroup.get('billingAddress.state');}
   get billingAddressZipCode() {return this.checkoutFormGroup.get('billingAddress.zipCode');}
   get billingAddressCountry() {return this.checkoutFormGroup.get('billingAddress.country');}
+
+  get creditCardType() {return this.checkoutFormGroup.get('creditCard.cardType');}
+  get creditCardNameOnCard() {return this.checkoutFormGroup.get('creditCard.nameOnCard');}
+  get creditCardNumber() {return this.checkoutFormGroup.get('creditCard.cardNumber');}
+  get creditCardSecurityCode() {return this.checkoutFormGroup.get('creditCard.securityCode');}
 
 
   copyShippingAddressToBillingAddress(event) {
@@ -146,21 +173,41 @@ export class CheckoutComponent implements OnInit{
 
     if (this.checkoutFormGroup.invalid){
       this.checkoutFormGroup.markAllAsTouched();
+      return;
     }
 
-    console.log(this.checkoutFormGroup.get('customer').value);
-    console.log("The email address is " + this.checkoutFormGroup.get('customer').value.email);
+    // set up order
+    let order = new Order();
+    order.totalPrice = this.totalPrice;
+    order.totalQuantity = this.totalQuantity;
+    // get card items
+    const cartItems = this.cartService.cartItems;
+    /*
+    // create orderItems from cartItems
+    let orderItems: OrderItem[] = [];
+    for (let i=0; i < cartItems.length; i++){
+      orderItems[i] = new OrderItem(cartItems[i]);
+    }
+    */
 
-    console.log("The shipping address country is " + this.checkoutFormGroup.get('shippingAddress').value.country.name);
-    console.log("The shipping address state is " + this.checkoutFormGroup.get('shippingAddress').value.state.name);
+    let orderItemsShort: OrderItem[] = cartItems.map(tempCartItem => new OrderItem(tempCartItem));
 
 
+    // set up purchase
+    let purchase = new Purchase();
 
+    // populate purchase - shipping address
+    purchase.shippingAddress = this.checkoutFormGroup.controls['shippingAddress']
+    // populate purchase - billing address
+
+    // populate purchase - order and orderItems
+
+    // call REST API via the CheckoutService
   }
 
   handleMonthsAndYears() {
 
-    const creditCardFormGroup = this.checkoutFormGroup.get('creditCardAddress');
+    const creditCardFormGroup = this.checkoutFormGroup.get('creditCard');
     const currentYear: number = new Date().getFullYear();
     const selectedYear: number = Number(creditCardFormGroup.value.expirationYear);
 
