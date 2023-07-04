@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 public class Country {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,5 +26,4 @@ public class Country {
     @OneToMany(mappedBy = "country")
     @JsonIgnore
     private List<State> states;
-
 }

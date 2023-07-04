@@ -1,10 +1,10 @@
-# Nazwa aplikacji
+# E Commerce Shop
 
-## Wstęp
+## Introduction
 
-(Krótki opis aplikacji, jej cel i funkcje)
+The task of the application is to demonstrate a simple E Commerce application, where the front-end website programmed in the Angular framework connects to the Spring Boot back-end.
 
-## Technologie
+## Technologies
 
 - Spring Boot
 - Angular
@@ -13,10 +13,11 @@
 
 ## Wymagania
 
-Podaj wymagania do uruchomienia aplikacji, np.:
+Requirements, np.:
 
-- JDK 11
+- Amazon Coretto 17
 - Node.js v18
+- MySQL 8.0
 - Docker
 - Docker Compose
 
@@ -29,13 +30,10 @@ Podaj wymagania do uruchomienia aplikacji, np.:
 3. Ustaw zmienną środowiskową: `export...` (Jeżeli to jest konieczne)
 4. Uruchom aplikację: `docker-compose up` (lub inna komenda do uruchomienia)
 
-## Jak używać aplikacji
+## How to use that app
 
 (Podaj tutaj krótkie instrukcje na temat tego, jak korzystać z Twojej aplikacji)
 
-## Testy
-
-(Jeżeli masz testy, podaj instrukcje jak je uruchomić)
 
 ## API
 

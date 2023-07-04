@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class OrderItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
@@ -32,7 +31,4 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name="order_id", nullable=false)
     private Order order;
-
-
-
 }

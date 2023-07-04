@@ -12,7 +12,6 @@ import java.util.Date;
 @Table(name="product")
 @Data
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -50,7 +49,5 @@ public class Product {
     @Column(name = "lastUpdated")
     @UpdateTimestamp
     private Date lastUpdated;
-
-
 
 }

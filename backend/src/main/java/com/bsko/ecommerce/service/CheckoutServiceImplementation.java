@@ -25,7 +25,6 @@ public class CheckoutServiceImplementation implements CheckoutService{
     @Override
     @Transactional
     public PurchaseResponse placeOrder(Purchase purchase) {
-
         // retrieve the order info from dto
         Order order = purchase.getOrder();
 
@@ -41,7 +40,6 @@ public class CheckoutServiceImplementation implements CheckoutService{
         order.setBillingAddress(purchase.getBillingAddress());
         order.setShippingAddress(purchase.getShippingAddress());
 
-
         // populate customer with order
         Customer customer = purchase.getCustomer();
         customer.add(order);
@@ -54,7 +52,6 @@ public class CheckoutServiceImplementation implements CheckoutService{
     }
 
     private String generateOrderTrackingNumber() {
-
         // generate a random UUID number (UUID version-4)
         return UUID.randomUUID().toString();
     }

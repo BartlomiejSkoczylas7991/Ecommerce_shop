@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Address {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
@@ -33,5 +32,4 @@ public class Address {
     @OneToOne
     @PrimaryKeyJoinColumn
     private Order order;
-
 }
